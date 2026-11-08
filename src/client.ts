@@ -4,6 +4,8 @@ import { PaymentsResource } from "./resources/payments.js";
 import { CheckoutResource } from "./resources/checkout.js";
 import { PaymentLinksResource } from "./resources/payment-links.js";
 import { CustomersResource } from "./resources/customers.js";
+import { InvoicesResource } from "./resources/invoices.js";
+import { SubscriptionsResource } from "./resources/subscriptions.js";
 
 export class EDPayClient {
   private readonly publicKey: string;
@@ -15,6 +17,8 @@ export class EDPayClient {
   public readonly checkout: CheckoutResource;
   public readonly paymentLinks: PaymentLinksResource;
   public readonly customers: CustomersResource;
+  public readonly invoices: InvoicesResource;
+  public readonly subscriptions: SubscriptionsResource;
 
   constructor(options: EDPayClientOptions) {
     if (!options?.publicKey || !options?.privateKey) {
@@ -38,6 +42,8 @@ export class EDPayClient {
     this.checkout = new CheckoutResource(this);
     this.paymentLinks = new PaymentLinksResource(this);
     this.customers = new CustomersResource(this);
+    this.invoices = new InvoicesResource(this);
+    this.subscriptions = new SubscriptionsResource(this);
   }
 
   async request<T = any>(

@@ -11,10 +11,15 @@ export interface EDPayClientOptions {
 export interface PaymentCreateOptions {
   amount_minor: number;
   currency: string;
-  method: string;
+  method?: string;
+  methods?: string[];
   phone?: string;
   reference?: string;
   description?: string;
+  return_url?: string;
+  cancel_url?: string;
+  channel?: string;
+  expires_in_minutes?: number;
   emola_custom_message?: string;
   customer?: {
     name?: string;
