@@ -18,6 +18,13 @@ export interface MountOptions extends OpenModalOptions {
   height?: string;
 }
 
+export interface CheckoutOptions extends OpenModalOptions {
+  mode?: "modal" | "embedded" | "redirect";
+  container?: string | HTMLElement;
+  width?: string;
+  height?: string;
+}
+
 export class EDPay {
   private readonly publicKey: string;
   private readonly baseUrl: string;
@@ -50,6 +57,20 @@ export class EDPay {
       return `${this.baseUrl}/pay?token=${encodeURIComponent(options.token)}&pk=${encodeURIComponent(this.publicKey)}`;
     }
     throw new Error("EDPay: Either 'token' or 'paymentUrl' must be provided.");
+  }
+
+  /**
+   * Unified checkout initiator supporting modal, embedded iframe, or direct redirect.
+   */
+  checkout(options: CheckoutOptions): { close?: () => void; unmount?: () => void } | void {
+    if (options.mode === "embedded" || options.container) {
+      return this.mount(options as MountOptions);
+    }
+    if (options.mode === "redirect") {
+      this.redirectToCheckout(options);
+      return;
+    }
+    return this.openModal(options);
   }
 
   /**
