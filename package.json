@@ -1,0 +1,14 @@
+{
+  "name": "@edutecka/edpay",
+  "version": "0.1.0",
+  "description": "SDK oficial da plataforma EDPay para JavaScript e TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "keywords": ["edpay", "payment", "mozambique", "mpesa", "emola", "gateway"],
+  "author": "Edutecka Servicos Tecnologicos Lda",
+  "license": "MIT"
+}
