@@ -1,0 +1,27 @@
+{
+  "name": "@edpay/sdk",
+  "version": "1.0.0",
+  "description": "SDK Oficial EDPay para JavaScript e TypeScript (Node.js, Next.js, Express, NestJS)",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test"
+  },
+  "keywords": [
+    "edpay",
+    "payments",
+    "mpesa",
+    "emola",
+    "mozambique",
+    "gateway",
+    "fintech"
+  ],
+  "author": "EDPay Engineering <dev@edutecka.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}
