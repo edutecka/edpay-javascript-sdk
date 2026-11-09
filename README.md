@@ -50,13 +50,24 @@ console.log(payment);
 
 By default, the client uses `https://api-pay.edutecka.com`; set `baseUrl` only when EDPay provides a different API host for your account. Sandbox or production access is determined by the API keys. The client sends `X-EDPay-Public-Key` and `X-EDPay-Private-Key` headers. `idempotencyKey` is sent as the `Idempotency-Key` header. Payment amounts are expressed in minor currency units. The `method` is dynamic and should be an identifier returned by `GET /v1/public/payment-methods` or otherwise supported for the account; do not hard-code a particular gateway into a multi-gateway flow.
 
-Browser checkout helpers are available from the frontend-only entry point. Use a public key only; never bundle a private key into browser code:
+### Browser checkout (frontend only)
+
+`EDPay` is the browser checkout helper. It is separate from the server-side `EDPayClient` instance named `edpay` above. Use a public key only; never bundle a private key into browser code. Pass the checkout token created by your server:
 
 ```typescript
 import { EDPay } from "@edutecka-mz/edpay-sdk/frontend";
+
+const checkoutClient = new EDPay({
+  publicKey: process.env.NEXT_PUBLIC_EDPAY_PUBLIC_KEY!,
+  environment: "sandbox",
+});
+
+checkoutClient.checkout({ token: checkoutToken, mode: "redirect" });
 ```
 
 To retrieve a payment:
+
+Use the server-side `edpay` (`EDPayClient`) instance created in the first example:
 
 ```typescript
 const payment = await edpay.payments.retrieve("PAYMENT_ID");
