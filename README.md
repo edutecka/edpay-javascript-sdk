@@ -57,6 +57,7 @@ By default, the client uses `https://api-pay.edutecka.com`; set `baseUrl` only w
 ```typescript
 import { EDPay } from "@edutecka-mz/edpay-sdk/frontend";
 
+const checkoutToken = "<TOKEN_RETURNED_BY_YOUR_SERVER>";
 const checkoutClient = new EDPay({
   publicKey: process.env.NEXT_PUBLIC_EDPAY_PUBLIC_KEY!,
   environment: "sandbox",
@@ -91,6 +92,18 @@ console.log(session);
 ```
 
 The SDK sends this request to `POST /v1/checkout/sessions`. Confirm payment using a verified webhook or a server-side payment lookup; a browser redirect alone is not proof of payment.
+
+## Available operations
+
+- Payments: `create`, `retrieve`, `cancel`
+- Checkout sessions: `createSession`, `retrieveSession`, `expireSession`
+- Payment links: `create`, `retrieve`, `revoke`
+- Customers: `create`, `retrieve`, `update`
+- Invoices: `create`, `list`, `retrieve`, `finalize`, `voidInvoice`
+- Subscriptions: `create`, `list`, `retrieve`, `pause`, `resume`, `cancel`
+- Webhooks: `verifyWebhookSignature`
+
+Payment, invoice, customer, and subscription methods return parsed JSON responses. Failed API requests throw `EDPayError`, which exposes `statusCode` and `responseData` for application-level handling.
 
 ## Verify webhook signatures
 
