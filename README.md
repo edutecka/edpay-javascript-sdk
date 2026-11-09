@@ -1,102 +1,138 @@
-# @edpay/sdk - SDK Oficial EDPay para JavaScript & TypeScript
+# EDPay JavaScript / TypeScript SDK
 
-Biblioteca cliente oficial para integração server-to-server com a plataforma EDPay em ambientes Node.js, Next.js, Express, Fastify e NestJS.
+The official JavaScript and TypeScript SDK for server-side Node.js applications. It can also be used in browser code through its frontend helpers, but **never expose a private API key in a browser or other untrusted environment**.
 
----
+## Requirements
 
-## Instalação
+- Node.js 20 or later
+- npm, pnpm, or yarn
+
+## Install
+
+Install directly from this repository. This installs the repository package; this guide does not assume a separate npm registry release.
 
 ```bash
-npm install @edpay/sdk
-# ou
-pnpm add @edpay/sdk
-# ou
-yarn add @edpay/sdk
+npm install git+https://github.com/edutecka/edpay-javascript-sdk.git
 ```
 
----
+To build and test a local checkout:
 
-## Inicialização
+```bash
+git clone https://github.com/edutecka/edpay-javascript-sdk.git
+cd edpay-javascript-sdk
+npm install
+npm run build
+npm test
+```
+
+The package import name is `@edpay/sdk`.
+
+## Create a payment from a Node.js service
+
+Store the keys in the server environment, not in source control:
+
+```dotenv
+EDPAY_PUBLIC_KEY=pk_test_...
+EDPAY_PRIVATE_KEY=sk_test_...
+EDPAY_METHOD=method_id_from_payment_methods
+```
 
 ```typescript
 import { EDPayClient } from "@edpay/sdk";
 
 const edpay = new EDPayClient({
-  publicKey: process.env.EDPAY_PUBLIC_KEY!,   // pk_live_... ou pk_test_...
-  privateKey: process.env.EDPAY_PRIVATE_KEY!, // sk_live_... ou sk_test_...
-  environment: "production", // ou "sandbox"
+  publicKey: process.env.EDPAY_PUBLIC_KEY!,
+  privateKey: process.env.EDPAY_PRIVATE_KEY!,
+  environment: "sandbox",
 });
+
+const payment = await edpay.payments.create({
+  amount_minor: 50000, // 500.00 MZN
+  currency: "MZN",
+  method: process.env.EDPAY_METHOD, // Select an ID supported by the account/API.
+  reference: "ORDER-10492",
+  description: "Example order",
+  idempotencyKey: "ORDER-10492",
+});
+
+console.log(payment);
 ```
 
----
+The client selects the sandbox endpoint when `environment` is `"sandbox"`; otherwise it uses the production endpoint. It sends `X-EDPay-Public-Key` and `X-EDPay-Private-Key` headers. `idempotencyKey` is sent as the `Idempotency-Key` header. Payment amounts are expressed in minor currency units. The `method` is dynamic and should be an identifier returned by `GET /v1/public/payment-methods` or otherwise supported for the account; do not hard-code a particular gateway into a multi-gateway flow.
 
-## Exemplos de Uso
-
-### 1. Criar Pagamento Direto (API Checkout)
+To retrieve a payment:
 
 ```typescript
-const payment = await edpay.payments.create({
-  amount_minor: 50000,           // 500.00 MZN
-  currency: "MZN",
-  method: "emola",               // ou "mpesa", "card", "apple_pay", etc.
-  phone: "+25884xxxxxxx",        // obrigatório para carteiras móveis
-  reference: "FAT-2026-001",
-  description: "Subscrição Mensal",
-  emola_custom_message: "Pagamento de Serviços via EDPay",
-});
-
-console.log("ID da transação:", payment.id);
-console.log("Estado:", payment.status);
+const payment = await edpay.payments.retrieve("PAYMENT_ID");
 ```
 
-### 2. Criar Sessão de Checkout Alojado
+## Create a hosted checkout session
+
+Create the session on your server, then send the customer to the hosted checkout URL returned by the API:
 
 ```typescript
 const session = await edpay.checkout.createSession({
-  amount_minor: 150000,
+  amount_minor: 50000,
   currency: "MZN",
-  success_url: "https://minhaloja.co.mz/sucesso?session_id={CHECKOUT_SESSION_ID}",
-  cancel_url: "https://minhaloja.co.mz/cancelado",
-  reference: "ENC-9982",
+  success_url: "https://merchant.example/checkout/success",
+  cancel_url: "https://merchant.example/checkout/cancel",
+  reference: "ORDER-10492",
+  idempotencyKey: "ORDER-10492-checkout",
 });
 
-console.log("Redirecionar cliente para:", session.checkout_url);
+console.log(session);
 ```
 
-### 3. Verificar Assinatura de Webhook
+The SDK sends this request to `POST /v1/checkout/sessions`. Confirm payment using a verified webhook or a server-side payment lookup; a browser redirect alone is not proof of payment.
+
+## Verify webhook signatures
+
+Use the raw request body and the `X-EDPay-Signature` header before parsing or processing an event. For example, in a Next.js route handler:
 
 ```typescript
 import { verifyWebhookSignature } from "@edpay/sdk";
 
-// No handler do Next.js App Router (src/app/api/webhooks/edpay/route.ts)
-export async function POST(req: Request) {
-  const rawBody = await req.text();
-  const signature = req.headers.get("x-edpay-signature") || "";
-  const webhookSecret = process.env.EDPAY_WEBHOOK_SECRET!;
+export async function POST(request: Request) {
+  const rawBody = await request.text();
+  const signature = request.headers.get("x-edpay-signature") ?? "";
+  const secret = process.env.EDPAY_WEBHOOK_SECRET!;
 
-  const isValid = verifyWebhookSignature(rawBody, signature, webhookSecret);
-  if (!isValid) {
+  if (!verifyWebhookSignature(rawBody, signature, secret)) {
     return new Response("Invalid signature", { status: 400 });
   }
 
   const event = JSON.parse(rawBody);
-  if (event.event === "payment.succeeded") {
-    // Processar aprovação de encomenda
+  if (event.type === "payment.succeeded") {
+    // Update the matching order idempotently using event.data.
   }
 
   return Response.json({ received: true });
 }
 ```
 
----
+## Official documentation
 
-## Prazos e Condições Comerciais
+- [SDK installation and integration guide](https://docs-pay.edutecka.com/sdks/)
+- [Payments API reference](https://docs-pay.edutecka.com/api/payments/)
+- [Authentication and API keys](https://docs-pay.edutecka.com/guides/authentication/)
+- [Webhooks](https://docs-pay.edutecka.com/api/webhooks/)
 
-- **Tarifa Unificada**: 6,00% em Meticais (MZN) sem custos de manutenção.
-- **Liquidação Bancária**: Transferência automática no prazo de 2 a 7 dias úteis.
+## Other official SDK repositories
 
----
+- [PHP SDK](https://github.com/edutecka/edpay-php-sdk)
+- [Python SDK](https://github.com/edutecka/edpay-python-sdk)
+- [Java SDK](https://github.com/edutecka/edpay-java-sdk)
+- [.NET SDK](https://github.com/edutecka/edpay-dot-net-sdk)
 
-## Licença
+## Official plugin repositories
 
-MIT © [EDPay](https://edpay.co.mz)
+- [WooCommerce (WordPress)](https://github.com/edutecka/edpay-woocommerce-plugin)
+- [Shopify](https://github.com/edutecka/edpay-shopify-app)
+- [Magento / Adobe Commerce](https://github.com/edutecka/edpay-magento2-module) — integration preview; not production-ready
+- [PrestaShop](https://github.com/edutecka/edpay-prestashop-module)
+- [OpenCart](https://github.com/edutecka/edpay-opencart-extension)
+- [WHMCS](https://github.com/edutecka/edpay-whmcs-gateway)
+
+## License
+
+MIT. See [LICENSE](LICENSE).
