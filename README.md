@@ -9,23 +9,13 @@ The official JavaScript and TypeScript SDK for server-side Node.js applications.
 
 ## Install
 
-Install directly from this repository. This installs the repository package; this guide does not assume a separate npm registry release.
+Install the package from npm:
 
 ```bash
-npm install git+https://github.com/edutecka/edpay-javascript-sdk.git
+npm install @edutecka-mz/edpay-sdk
 ```
 
-To build and test a local checkout:
-
-```bash
-git clone https://github.com/edutecka/edpay-javascript-sdk.git
-cd edpay-javascript-sdk
-npm install
-npm run build
-npm test
-```
-
-The package import name is `@edpay/sdk`.
+The package import name is `@edutecka-mz/edpay-sdk`.
 
 ## Create a payment from a Node.js service
 
@@ -38,7 +28,7 @@ EDPAY_METHOD=method_id_from_payment_methods
 ```
 
 ```typescript
-import { EDPayClient } from "@edpay/sdk";
+import { EDPayClient } from "@edutecka-mz/edpay-sdk";
 
 const edpay = new EDPayClient({
   publicKey: process.env.EDPAY_PUBLIC_KEY!,
@@ -58,7 +48,13 @@ const payment = await edpay.payments.create({
 console.log(payment);
 ```
 
-The client selects the sandbox endpoint when `environment` is `"sandbox"`; otherwise it uses the production endpoint. It sends `X-EDPay-Public-Key` and `X-EDPay-Private-Key` headers. `idempotencyKey` is sent as the `Idempotency-Key` header. Payment amounts are expressed in minor currency units. The `method` is dynamic and should be an identifier returned by `GET /v1/public/payment-methods` or otherwise supported for the account; do not hard-code a particular gateway into a multi-gateway flow.
+By default, the client uses `https://api-pay.edutecka.com`; set `baseUrl` only when EDPay provides a different API host for your account. Sandbox or production access is determined by the API keys. The client sends `X-EDPay-Public-Key` and `X-EDPay-Private-Key` headers. `idempotencyKey` is sent as the `Idempotency-Key` header. Payment amounts are expressed in minor currency units. The `method` is dynamic and should be an identifier returned by `GET /v1/public/payment-methods` or otherwise supported for the account; do not hard-code a particular gateway into a multi-gateway flow.
+
+Browser checkout helpers are available from the frontend-only entry point. Use a public key only; never bundle a private key into browser code:
+
+```typescript
+import { EDPay } from "@edutecka-mz/edpay-sdk/frontend";
+```
 
 To retrieve a payment:
 
@@ -90,7 +86,7 @@ The SDK sends this request to `POST /v1/checkout/sessions`. Confirm payment usin
 Use the raw request body and the `X-EDPay-Signature` header before parsing or processing an event. For example, in a Next.js route handler:
 
 ```typescript
-import { verifyWebhookSignature } from "@edpay/sdk";
+import { verifyWebhookSignature } from "@edutecka-mz/edpay-sdk";
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
