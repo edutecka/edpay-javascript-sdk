@@ -43,7 +43,7 @@ export class EDPay {
       } else {
         this.baseUrl =
           options.environment === "sandbox"
-            ? "https://sandbox.pay.edutecka.com"
+            ? "https://pay.edutecka.com"
             : "https://pay.edutecka.com";
       }
     }
@@ -57,6 +57,22 @@ export class EDPay {
       return `${this.baseUrl}/pay?token=${encodeURIComponent(options.token)}&pk=${encodeURIComponent(this.publicKey)}`;
     }
     throw new Error("EDPay: Either 'token' or 'paymentUrl' must be provided.");
+  }
+
+  private resolveEmbeddedUrl(options: { token?: string; paymentUrl?: string }): string {
+    if (!options.token || typeof options.token !== "string") {
+      throw new Error("EDPay: A checkout token is required for embedded modes.");
+    }
+
+    const url = new URL(this.resolveUrl(options), document.baseURI);
+    const sdkOrigin = new URL(this.baseUrl, document.baseURI).origin;
+    if (url.origin !== sdkOrigin || url.pathname !== "/pay" || url.protocol !== "https:") {
+      throw new Error("EDPay: Embedded checkout URL must be a secure /pay URL on the configured EDPay origin.");
+    }
+
+    url.searchParams.set("embed", "1");
+    url.searchParams.set("token", options.token);
+    return url.toString();
   }
 
   /**
@@ -90,7 +106,7 @@ export class EDPay {
       return { close: () => {} };
     }
 
-    const checkoutUrl = this.resolveUrl(options);
+    const checkoutUrl = this.resolveEmbeddedUrl(options);
 
     // Overlay backdrop
     const overlay = document.createElement("div");
@@ -149,6 +165,7 @@ export class EDPay {
     // Iframe
     const iframe = document.createElement("iframe");
     iframe.src = checkoutUrl;
+    const checkoutOrigin = new URL(iframe.src).origin;
     iframe.style.width = "100%";
     iframe.style.height = "100%";
     iframe.style.border = "none";
@@ -186,6 +203,7 @@ export class EDPay {
     });
 
     const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== checkoutOrigin || event.source !== iframe.contentWindow) return;
       if (!event.data || typeof event.data !== "object") return;
       const { type, payload } = event.data;
 
@@ -223,9 +241,10 @@ export class EDPay {
       throw new Error(`EDPay: Target container '${options.container}' not found.`);
     }
 
-    const checkoutUrl = this.resolveUrl(options);
+    const checkoutUrl = this.resolveEmbeddedUrl(options);
     const iframe = document.createElement("iframe");
     iframe.src = checkoutUrl;
+    const checkoutOrigin = new URL(iframe.src).origin;
     iframe.style.width = options.width ?? "100%";
     iframe.style.height = options.height ?? "620px";
     iframe.style.border = "none";
@@ -236,6 +255,7 @@ export class EDPay {
     target.appendChild(iframe);
 
     const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== checkoutOrigin || event.source !== iframe.contentWindow) return;
       if (!event.data || typeof event.data !== "object") return;
       const { type, payload } = event.data;
 
