@@ -15,10 +15,27 @@ class CheckoutResource {
         return this.client.request("POST", "/v1/checkout/sessions", payload, headers);
     }
     async retrieveSession(sessionId) {
-        return this.client.request("GET", `/v1/checkout/sessions/${sessionId}`);
+        return this.client.request("GET", `/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, undefined, undefined, false);
     }
-    async expireSession(sessionId) {
-        return this.client.request("POST", `/v1/checkout/sessions/${sessionId}/expire`);
+    async getPaymentLink(linkId) {
+        return this.client.request("GET", `/v1/checkout/payment-links/${encodeURIComponent(linkId)}`, undefined, undefined, false);
+    }
+    async getFramePolicy(token) {
+        return this.client.request("GET", `/v1/checkout/sessions/${encodeURIComponent(token)}/frame-policy`, undefined, undefined, false);
+    }
+    async createSessionPayment(token, options) {
+        const { idempotencyKey, ...payload } = options;
+        return this.client.request("POST", `/v1/checkout/sessions/${encodeURIComponent(token)}/payments`, payload, { "Idempotency-Key": idempotencyKey }, false);
+    }
+    async retrieveSessionPayment(token, paymentId) {
+        return this.client.request("GET", `/v1/checkout/sessions/${encodeURIComponent(token)}/payments/${encodeURIComponent(paymentId)}`, undefined, undefined, false);
+    }
+    async createPaymentLinkPayment(linkId, options) {
+        const { idempotencyKey, ...payload } = options;
+        return this.client.request("POST", `/v1/checkout/payment-links/${encodeURIComponent(linkId)}/payments`, payload, { "Idempotency-Key": idempotencyKey }, false);
+    }
+    async retrievePaymentLinkPayment(linkId, paymentId) {
+        return this.client.request("GET", `/v1/checkout/payment-links/${encodeURIComponent(linkId)}/payments/${encodeURIComponent(paymentId)}`, undefined, undefined, false);
     }
 }
 exports.CheckoutResource = CheckoutResource;

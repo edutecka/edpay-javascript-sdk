@@ -1,34 +1,48 @@
 import * as crypto from "node:crypto";
 
+export interface WebhookSignatureOptions {
+  /** Maximum accepted age or clock skew in seconds. Defaults to 300 seconds. */
+  toleranceSeconds?: number;
+  /** Current Unix timestamp in seconds, injectable for deterministic verification. */
+  now?: number;
+}
+
 /**
- * Valida a autenticidade de um evento de webhook da EDPay usando HMAC SHA-256 em tempo constante.
- *
- * @param payload Corpo bruto da requisição HTTP (Buffer ou string).
- * @param signature Valor recebido no header `X-EDPay-Signature`.
- * @param secret Segredo de webhook obtido no dashboard da EDPay (`whsec_...`).
+ * Verify an EDPay `Payment-Signature` header against the raw HTTP request body.
+ * EDPay signs `timestamp + "." + rawBody` with HMAC-SHA256. Verify before parsing
+ * JSON, and reject stale timestamps to limit replay attacks.
  */
 export function verifyWebhookSignature(
   payload: string | Buffer,
-  signature: string,
-  secret: string
+  signatureHeader: string,
+  secret: string,
+  options: WebhookSignatureOptions = {}
 ): boolean {
-  if (!payload || !signature || !secret) {
-    return false;
-  }
+  if (!payload || !signatureHeader || !secret) return false;
 
-  const cleanSig = signature.trim().toLowerCase();
-  const hmac = crypto.createHmac("sha256", secret);
-  hmac.update(payload);
-  const digest = hmac.digest("hex").toLowerCase();
+  const tolerance = options.toleranceSeconds ?? 300;
+  const now = options.now ?? Math.floor(Date.now() / 1000);
+  if (!Number.isInteger(tolerance) || tolerance < 0 || !Number.isFinite(now)) return false;
 
-  try {
-    const sigBuf = Buffer.from(cleanSig, "utf8");
-    const digestBuf = Buffer.from(digest, "utf8");
-    if (sigBuf.length !== digestBuf.length) {
-      return false;
+  let timestamp: string | undefined;
+  let signature: string | undefined;
+  for (const field of signatureHeader.split(",")) {
+    const [rawKey, ...rawValue] = field.trim().split("=");
+    const key = rawKey?.trim();
+    const value = rawValue.join("=").trim();
+    if (key === "t") {
+      if (timestamp !== undefined) return false;
+      timestamp = value;
+    } else if (key === "v1") {
+      if (signature !== undefined) return false;
+      signature = value;
     }
-    return crypto.timingSafeEqual(sigBuf, digestBuf);
-  } catch {
-    return false;
   }
+  if (!timestamp || !/^\d+$/.test(timestamp) || !signature || !/^[a-f\d]{64}$/i.test(signature)) return false;
+  const signedAt = Number(timestamp);
+  if (!Number.isSafeInteger(signedAt) || Math.abs(now - signedAt) > tolerance) return false;
+
+  const expected = crypto.createHmac("sha256", secret).update(`${timestamp}.`).update(payload).digest();
+  const received = Buffer.from(signature, "hex");
+  return received.length === expected.length && crypto.timingSafeEqual(expected, received);
 }

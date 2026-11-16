@@ -1,9 +1,13 @@
+export interface WebhookSignatureOptions {
+    /** Maximum accepted age or clock skew in seconds. Defaults to 300 seconds. */
+    toleranceSeconds?: number;
+    /** Current Unix timestamp in seconds, injectable for deterministic verification. */
+    now?: number;
+}
 /**
- * Valida a autenticidade de um evento de webhook da EDPay usando HMAC SHA-256 em tempo constante.
- *
- * @param payload Corpo bruto da requisição HTTP (Buffer ou string).
- * @param signature Valor recebido no header `X-EDPay-Signature`.
- * @param secret Segredo de webhook obtido no dashboard da EDPay (`whsec_...`).
+ * Verify an EDPay `Payment-Signature` header against the raw HTTP request body.
+ * EDPay signs `timestamp + "." + rawBody` with HMAC-SHA256. Verify before parsing
+ * JSON, and reject stale timestamps to limit replay attacks.
  */
-export declare function verifyWebhookSignature(payload: string | Buffer, signature: string, secret: string): boolean;
+export declare function verifyWebhookSignature(payload: string | Buffer, signatureHeader: string, secret: string, options?: WebhookSignatureOptions): boolean;
 //# sourceMappingURL=webhooks.d.ts.map

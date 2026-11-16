@@ -36,30 +36,41 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyWebhookSignature = verifyWebhookSignature;
 const crypto = __importStar(require("node:crypto"));
 /**
- * Valida a autenticidade de um evento de webhook da EDPay usando HMAC SHA-256 em tempo constante.
- *
- * @param payload Corpo bruto da requisição HTTP (Buffer ou string).
- * @param signature Valor recebido no header `X-EDPay-Signature`.
- * @param secret Segredo de webhook obtido no dashboard da EDPay (`whsec_...`).
+ * Verify an EDPay `Payment-Signature` header against the raw HTTP request body.
+ * EDPay signs `timestamp + "." + rawBody` with HMAC-SHA256. Verify before parsing
+ * JSON, and reject stale timestamps to limit replay attacks.
  */
-function verifyWebhookSignature(payload, signature, secret) {
-    if (!payload || !signature || !secret) {
+function verifyWebhookSignature(payload, signatureHeader, secret, options = {}) {
+    if (!payload || !signatureHeader || !secret)
         return false;
-    }
-    const cleanSig = signature.trim().toLowerCase();
-    const hmac = crypto.createHmac("sha256", secret);
-    hmac.update(payload);
-    const digest = hmac.digest("hex").toLowerCase();
-    try {
-        const sigBuf = Buffer.from(cleanSig, "utf8");
-        const digestBuf = Buffer.from(digest, "utf8");
-        if (sigBuf.length !== digestBuf.length) {
-            return false;
+    const tolerance = options.toleranceSeconds ?? 300;
+    const now = options.now ?? Math.floor(Date.now() / 1000);
+    if (!Number.isInteger(tolerance) || tolerance < 0 || !Number.isFinite(now))
+        return false;
+    let timestamp;
+    let signature;
+    for (const field of signatureHeader.split(",")) {
+        const [rawKey, ...rawValue] = field.trim().split("=");
+        const key = rawKey?.trim();
+        const value = rawValue.join("=").trim();
+        if (key === "t") {
+            if (timestamp !== undefined)
+                return false;
+            timestamp = value;
         }
-        return crypto.timingSafeEqual(sigBuf, digestBuf);
+        else if (key === "v1") {
+            if (signature !== undefined)
+                return false;
+            signature = value;
+        }
     }
-    catch {
+    if (!timestamp || !/^\d+$/.test(timestamp) || !signature || !/^[a-f\d]{64}$/i.test(signature))
         return false;
-    }
+    const signedAt = Number(timestamp);
+    if (!Number.isSafeInteger(signedAt) || Math.abs(now - signedAt) > tolerance)
+        return false;
+    const expected = crypto.createHmac("sha256", secret).update(`${timestamp}.`).update(payload).digest();
+    const received = Buffer.from(signature, "hex");
+    return received.length === expected.length && crypto.timingSafeEqual(expected, received);
 }
 //# sourceMappingURL=webhooks.js.map

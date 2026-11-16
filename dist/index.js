@@ -22,5 +22,6 @@ Object.defineProperty(exports, "EDPayError", { enumerable: true, get: function (
 Object.defineProperty(exports, "SignatureVerificationError", { enumerable: true, get: function () { return exceptions_js_1.SignatureVerificationError; } });
 var webhooks_js_1 = require("./webhooks.js");
 Object.defineProperty(exports, "verifyWebhookSignature", { enumerable: true, get: function () { return webhooks_js_1.verifyWebhookSignature; } });
+__exportStar(require("./contacts.js"), exports);
 __exportStar(require("./types.js"), exports);
 //# sourceMappingURL=index.js.map

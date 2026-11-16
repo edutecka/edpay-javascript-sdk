@@ -6,6 +6,10 @@ import { PaymentLinksResource } from "./resources/payment-links.js";
 import { CustomersResource } from "./resources/customers.js";
 import { InvoicesResource } from "./resources/invoices.js";
 import { SubscriptionsResource } from "./resources/subscriptions.js";
+import { FxResource } from "./resources/fx.js";
+import { WalletsResource } from "./resources/wallets.js";
+import { WebhooksResource } from "./resources/webhooks.js";
+import { PublicResource } from "./resources/public.js";
 
 export class EDPayClient {
   private readonly publicKey: string;
@@ -19,6 +23,10 @@ export class EDPayClient {
   public readonly customers: CustomersResource;
   public readonly invoices: InvoicesResource;
   public readonly subscriptions: SubscriptionsResource;
+  public readonly fx: FxResource;
+  public readonly wallets: WalletsResource;
+  public readonly webhooks: WebhooksResource;
+  public readonly public: PublicResource;
 
   constructor(options: EDPayClientOptions) {
     if (!options?.publicKey || !options?.privateKey) {
@@ -33,9 +41,7 @@ export class EDPayClient {
       this.baseUrl = options.baseUrl.replace(/\/+$/, "");
     } else {
       this.baseUrl =
-        options.environment === "sandbox"
-          ? "https://sandbox-api.edpay.co.mz"
-          : "https://api.edpay.co.mz";
+        options.baseUrl || "https://api-pay.edutecka.com";
     }
 
     this.payments = new PaymentsResource(this);
@@ -44,23 +50,30 @@ export class EDPayClient {
     this.customers = new CustomersResource(this);
     this.invoices = new InvoicesResource(this);
     this.subscriptions = new SubscriptionsResource(this);
+    this.fx = new FxResource(this);
+    this.wallets = new WalletsResource(this);
+    this.webhooks = new WebhooksResource(this);
+    this.public = new PublicResource(this);
   }
 
   async request<T = any>(
     method: string,
     path: string,
     body?: unknown,
-    customHeaders?: Record<string, string>
+    customHeaders?: Record<string, string>,
+    authenticated = true
   ): Promise<T> {
     const url = `${this.baseUrl}${path}`;
     const headers: Record<string, string> = {
-      "X-EDPay-Public-Key": this.publicKey,
-      "X-EDPay-Private-Key": this.privateKey,
       "Content-Type": "application/json",
       Accept: "application/json",
-      "User-Agent": "EDPay-Node-SDK/1.0.0",
+      "User-Agent": "EDPay-Node-SDK/1.4.0",
       ...customHeaders,
     };
+    if (authenticated) {
+      headers["X-EDPay-Public-Key"] = this.publicKey;
+      headers["X-EDPay-Private-Key"] = this.privateKey;
+    }
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
@@ -86,8 +99,13 @@ export class EDPayClient {
       }
 
       if (!response.ok) {
-        const errorMsg = data?.message || data?.error || `HTTP ${response.status} ${response.statusText}`;
-        throw new EDPayError(errorMsg, response.status, data);
+        const apiError = data?.error;
+        const errorMsg = apiError?.message || data?.message || (typeof apiError === "string" ? apiError : undefined) || `HTTP ${response.status} ${response.statusText}`;
+        throw new EDPayError(errorMsg, response.status, data, {
+          errorCode: apiError?.code,
+          requestId: response.headers.get("X-Request-Id") ?? undefined,
+          retryAfter: response.headers.get("Retry-After") ?? undefined,
+        });
       }
 
       return data as T;

@@ -1,7 +1,7 @@
-import type { CheckoutSessionCreateOptions } from "../types.js";
+import type { CheckoutPaymentOptions, CheckoutSessionCreateOptions } from "../types.js";
 
 export class CheckoutResource {
-  constructor(private readonly client: { request: (method: string, path: string, body?: unknown, headers?: Record<string, string>) => Promise<any> }) {}
+  constructor(private readonly client: { request: (method: string, path: string, body?: unknown, headers?: Record<string, string>, authenticated?: boolean) => Promise<any> }) {}
 
   async createSession(options: CheckoutSessionCreateOptions): Promise<any> {
     const { idempotencyKey, ...payload } = options;
@@ -13,10 +13,56 @@ export class CheckoutResource {
   }
 
   async retrieveSession(sessionId: string): Promise<any> {
-    return this.client.request("GET", `/v1/checkout/sessions/${sessionId}`);
+    return this.client.request("GET", `/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, undefined, undefined, false);
   }
 
-  async expireSession(sessionId: string): Promise<any> {
-    return this.client.request("POST", `/v1/checkout/sessions/${sessionId}/expire`);
+  async getPaymentLink(linkId: string): Promise<any> {
+    return this.client.request("GET", `/v1/checkout/payment-links/${encodeURIComponent(linkId)}`, undefined, undefined, false);
+  }
+
+  async getFramePolicy(token: string): Promise<any> {
+    return this.client.request("GET", `/v1/checkout/sessions/${encodeURIComponent(token)}/frame-policy`, undefined, undefined, false);
+  }
+
+  async createSessionPayment(token: string, options: CheckoutPaymentOptions): Promise<any> {
+    const { idempotencyKey, ...payload } = options;
+    return this.client.request(
+      "POST",
+      `/v1/checkout/sessions/${encodeURIComponent(token)}/payments`,
+      payload,
+      { "Idempotency-Key": idempotencyKey },
+      false
+    );
+  }
+
+  async retrieveSessionPayment(token: string, paymentId: string): Promise<any> {
+    return this.client.request(
+      "GET",
+      `/v1/checkout/sessions/${encodeURIComponent(token)}/payments/${encodeURIComponent(paymentId)}`,
+      undefined,
+      undefined,
+      false
+    );
+  }
+
+  async createPaymentLinkPayment(linkId: string, options: CheckoutPaymentOptions): Promise<any> {
+    const { idempotencyKey, ...payload } = options;
+    return this.client.request(
+      "POST",
+      `/v1/checkout/payment-links/${encodeURIComponent(linkId)}/payments`,
+      payload,
+      { "Idempotency-Key": idempotencyKey },
+      false
+    );
+  }
+
+  async retrievePaymentLinkPayment(linkId: string, paymentId: string): Promise<any> {
+    return this.client.request(
+      "GET",
+      `/v1/checkout/payment-links/${encodeURIComponent(linkId)}/payments/${encodeURIComponent(paymentId)}`,
+      undefined,
+      undefined,
+      false
+    );
   }
 }

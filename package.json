@@ -1,13 +1,48 @@
 {
-  "name": "@edpay/sdk",
-  "version": "1.0.0",
-  "description": "SDK Oficial EDPay para JavaScript e TypeScript (Node.js, Next.js, Express, NestJS)",
+  "name": "@edutecka-mz/edpay-sdk",
+  "version": "1.4.0",
+  "description": "Official EDPay SDK for Node.js and TypeScript with multi-gateway payments, hosted checkout, and webhook verification.",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./frontend": {
+      "types": "./dist/frontend.d.ts",
+      "require": "./dist/frontend.js",
+      "default": "./dist/frontend.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edutecka/edpay-javascript-sdk.git"
+  },
+  "homepage": "https://docs-pay.edutecka.com/sdks/",
+  "bugs": {
+    "url": "https://github.com/edutecka/edpay-javascript-sdk/issues"
+  },
+  "engines": {
+    "node": "^22.23.5 || ^24.22.3 || ^26.13.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
-    "test": "node --test"
+    "test": "node --test",
+    "prepare": "npm run build",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "edpay",

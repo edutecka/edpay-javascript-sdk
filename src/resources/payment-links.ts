@@ -12,11 +12,24 @@ export class PaymentLinksResource {
     return this.client.request("POST", "/v1/payment-links", payload, headers);
   }
 
-  async retrieve(linkId: string): Promise<any> {
-    return this.client.request("GET", `/v1/payment-links/${linkId}`);
+  async list(): Promise<any> {
+    return this.client.request("GET", "/v1/payment-links");
   }
 
-  async revoke(linkId: string): Promise<any> {
-    return this.client.request("POST", `/v1/payment-links/${linkId}/revoke`);
+  async retrieve(linkId: string): Promise<any> {
+    return this.client.request("GET", `/v1/payment-links/${encodeURIComponent(linkId)}`);
+  }
+
+  async deactivate(linkId: string, idempotencyKey: string): Promise<any> {
+    return this.client.request("POST", `/v1/payment-links/${encodeURIComponent(linkId)}/deactivate`, undefined, { "Idempotency-Key": idempotencyKey });
+  }
+
+  async createCheckoutSession(linkId: string, idempotencyKey: string, embedOrigin?: string): Promise<any> {
+    return this.client.request(
+      "POST",
+      "/v1/checkout/sessions",
+      { payment_link_id: linkId, ...(embedOrigin ? { embed_origin: embedOrigin } : {}) },
+      { "Idempotency-Key": idempotencyKey }
+    );
   }
 }

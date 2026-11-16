@@ -4,11 +4,17 @@ exports.SignatureVerificationError = exports.EDPayError = void 0;
 class EDPayError extends Error {
     statusCode;
     responseData;
-    constructor(message, statusCode = 400, responseData = null) {
+    errorCode;
+    requestId;
+    retryAfter;
+    constructor(message, statusCode = 400, responseData = null, metadata = {}) {
         super(message);
         this.name = "EDPayError";
         this.statusCode = statusCode;
         this.responseData = responseData;
+        this.errorCode = metadata.errorCode;
+        this.requestId = metadata.requestId;
+        this.retryAfter = metadata.retryAfter;
     }
 }
 exports.EDPayError = EDPayError;

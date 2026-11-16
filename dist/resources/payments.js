@@ -14,11 +14,23 @@ class PaymentsResource {
         }
         return this.client.request("POST", "/v1/payments", payload, headers);
     }
-    async retrieve(paymentId) {
-        return this.client.request("GET", `/v1/payments/${paymentId}`);
+    /** Legacy alias for creating a payment intent through /v1/payment-checkout. */
+    async createCheckout(options) {
+        const { idempotencyKey, ...payload } = options;
+        return this.client.request("POST", "/v1/payment-checkout", payload, { "Idempotency-Key": idempotencyKey });
     }
-    async cancel(paymentId) {
-        return this.client.request("POST", `/v1/payments/${paymentId}/cancel`);
+    async list(limit = 50) {
+        const query = new URLSearchParams({ limit: String(limit) });
+        return this.client.request("GET", `/v1/payments?${query}`);
+    }
+    async retrieve(paymentId) {
+        return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}`);
+    }
+    async listEvents(paymentId) {
+        return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}/events`);
+    }
+    async listAttempts(paymentId) {
+        return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}/attempts`);
     }
 }
 exports.PaymentsResource = PaymentsResource;

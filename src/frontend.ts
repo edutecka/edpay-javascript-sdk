@@ -144,7 +144,7 @@ export class EDPay {
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
     closeBtn.innerHTML = "&times;";
-    closeBtn.setAttribute("aria-label", "Fechar");
+    closeBtn.setAttribute("aria-label", "Close");
     closeBtn.style.position = "absolute";
     closeBtn.style.top = "12px";
     closeBtn.style.right = "12px";

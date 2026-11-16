@@ -14,11 +14,17 @@ class PaymentLinksResource {
         }
         return this.client.request("POST", "/v1/payment-links", payload, headers);
     }
-    async retrieve(linkId) {
-        return this.client.request("GET", `/v1/payment-links/${linkId}`);
+    async list() {
+        return this.client.request("GET", "/v1/payment-links");
     }
-    async revoke(linkId) {
-        return this.client.request("POST", `/v1/payment-links/${linkId}/revoke`);
+    async retrieve(linkId) {
+        return this.client.request("GET", `/v1/payment-links/${encodeURIComponent(linkId)}`);
+    }
+    async deactivate(linkId, idempotencyKey) {
+        return this.client.request("POST", `/v1/payment-links/${encodeURIComponent(linkId)}/deactivate`, undefined, { "Idempotency-Key": idempotencyKey });
+    }
+    async createCheckoutSession(linkId, idempotencyKey, embedOrigin) {
+        return this.client.request("POST", "/v1/checkout/sessions", { payment_link_id: linkId, ...(embedOrigin ? { embed_origin: embedOrigin } : {}) }, { "Idempotency-Key": idempotencyKey });
     }
 }
 exports.PaymentLinksResource = PaymentLinksResource;

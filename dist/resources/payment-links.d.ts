@@ -5,7 +5,9 @@ export declare class PaymentLinksResource {
         request: (method: string, path: string, body?: unknown, headers?: Record<string, string>) => Promise<any>;
     });
     create(options: PaymentLinkCreateOptions): Promise<any>;
+    list(): Promise<any>;
     retrieve(linkId: string): Promise<any>;
-    revoke(linkId: string): Promise<any>;
+    deactivate(linkId: string, idempotencyKey: string): Promise<any>;
+    createCheckoutSession(linkId: string, idempotencyKey: string, embedOrigin?: string): Promise<any>;
 }
 //# sourceMappingURL=payment-links.d.ts.map
