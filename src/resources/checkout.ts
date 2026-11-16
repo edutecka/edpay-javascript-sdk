@@ -45,6 +45,18 @@ export class CheckoutResource {
     );
   }
 
+  /** Change method for the same session payment after the previous attempt definitively failed. */
+  async createSessionPaymentAttempt(token: string, paymentId: string, options: CheckoutPaymentOptions): Promise<any> {
+    const { idempotencyKey, ...payload } = options;
+    return this.client.request(
+      "POST",
+      `/v1/checkout/sessions/${encodeURIComponent(token)}/payments/${encodeURIComponent(paymentId)}/attempts`,
+      payload,
+      { "Idempotency-Key": idempotencyKey },
+      false
+    );
+  }
+
   async createPaymentLinkPayment(linkId: string, options: CheckoutPaymentOptions): Promise<any> {
     const { idempotencyKey, ...payload } = options;
     return this.client.request(
@@ -62,6 +74,18 @@ export class CheckoutResource {
       `/v1/checkout/payment-links/${encodeURIComponent(linkId)}/payments/${encodeURIComponent(paymentId)}`,
       undefined,
       undefined,
+      false
+    );
+  }
+
+  /** Change method for the same payment-link payment after the previous attempt definitively failed. */
+  async createPaymentLinkPaymentAttempt(linkId: string, paymentId: string, options: CheckoutPaymentOptions): Promise<any> {
+    const { idempotencyKey, ...payload } = options;
+    return this.client.request(
+      "POST",
+      `/v1/checkout/payment-links/${encodeURIComponent(linkId)}/payments/${encodeURIComponent(paymentId)}/attempts`,
+      payload,
+      { "Idempotency-Key": idempotencyKey },
       false
     );
   }

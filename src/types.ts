@@ -20,6 +20,14 @@ export interface PaymentCreateOptions {
   idempotencyKey: string;
 }
 
+/** Create a child attempt using another method for an existing payment. */
+export interface PaymentAttemptCreateOptions {
+  method: string;
+  phone?: string;
+  channel?: PaymentChannelOptions;
+  idempotencyKey: string;
+}
+
 /** Method-specific payment instrument fields accepted by the partner API. */
 export interface PaymentChannelOptions {
   type?: string;

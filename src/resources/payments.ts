@@ -1,4 +1,4 @@
-import type { PaymentCreateOptions } from "../types.js";
+import type { PaymentAttemptCreateOptions, PaymentCreateOptions } from "../types.js";
 
 export class PaymentsResource {
   constructor(private readonly client: { request: (method: string, path: string, body?: unknown, headers?: Record<string, string>) => Promise<any> }) {}
@@ -16,6 +16,17 @@ export class PaymentsResource {
   async createCheckout(options: PaymentCreateOptions): Promise<any> {
     const { idempotencyKey, ...payload } = options;
     return this.client.request("POST", "/v1/payment-checkout", payload, { "Idempotency-Key": idempotencyKey });
+  }
+
+  /** Start another method for this payment after its latest attempt definitively failed. */
+  async createAttempt(paymentId: string, options: PaymentAttemptCreateOptions): Promise<any> {
+    const { idempotencyKey, ...payload } = options;
+    return this.client.request(
+      "POST",
+      `/v1/payments/${encodeURIComponent(paymentId)}/attempts`,
+      payload,
+      { "Idempotency-Key": idempotencyKey }
+    );
   }
 
   async list(limit = 50): Promise<any> {

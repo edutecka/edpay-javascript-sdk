@@ -19,6 +19,11 @@ class PaymentsResource {
         const { idempotencyKey, ...payload } = options;
         return this.client.request("POST", "/v1/payment-checkout", payload, { "Idempotency-Key": idempotencyKey });
     }
+    /** Start another method for this payment after its latest attempt definitively failed. */
+    async createAttempt(paymentId, options) {
+        const { idempotencyKey, ...payload } = options;
+        return this.client.request("POST", `/v1/payments/${encodeURIComponent(paymentId)}/attempts`, payload, { "Idempotency-Key": idempotencyKey });
+    }
     async list(limit = 50) {
         const query = new URLSearchParams({ limit: String(limit) });
         return this.client.request("GET", `/v1/payments?${query}`);

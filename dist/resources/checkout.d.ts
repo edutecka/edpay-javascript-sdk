@@ -10,7 +10,11 @@ export declare class CheckoutResource {
     getFramePolicy(token: string): Promise<any>;
     createSessionPayment(token: string, options: CheckoutPaymentOptions): Promise<any>;
     retrieveSessionPayment(token: string, paymentId: string): Promise<any>;
+    /** Change method for the same session payment after the previous attempt definitively failed. */
+    createSessionPaymentAttempt(token: string, paymentId: string, options: CheckoutPaymentOptions): Promise<any>;
     createPaymentLinkPayment(linkId: string, options: CheckoutPaymentOptions): Promise<any>;
     retrievePaymentLinkPayment(linkId: string, paymentId: string): Promise<any>;
+    /** Change method for the same payment-link payment after the previous attempt definitively failed. */
+    createPaymentLinkPaymentAttempt(linkId: string, paymentId: string, options: CheckoutPaymentOptions): Promise<any>;
 }
 //# sourceMappingURL=checkout.d.ts.map

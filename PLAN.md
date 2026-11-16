@@ -1,30 +1,30 @@
-# Roadmap & Plano de Arquitetura - EDPay JavaScript & TypeScript SDK
+# Roadmap & Architecture Plan - EDPay JavaScript & TypeScript SDK
 
-## Objectivos
-1. Desenvolver um cliente universal TypeScript com tipagem estrita e compatibilidade ESM + CommonJS.
-2. Zero dependências pesadas em tempo de execução (utilização da API nativa `fetch` do Node.js >= 18).
-3. Utilitários prontos para Next.js, Express, Fastify e NestJS.
+## Objectives
+1. Develop a universal TypeScript client with strict typing and ESM + CommonJS compatibility.
+2. Zero heavy runtime dependencies (using the native Node.js `fetch` API, version >= 18).
+3. Ready-to-use utilities for Next.js, Express, Fastify, and NestJS.
 
 ---
 
-## Fases de Desenvolvimento
+## Development Phases
 
-### Fase 1: Arquitetura Core & Autenticação (Concluído)
-- [x] Headers oficiais: `X-EDPay-Public-Key` e `X-EDPay-Private-Key`.
-- [x] Suporte a idempotência via `Idempotency-Key`.
-- [x] Alternância automática entre `sandbox` (`https://sandbox-api.edpay.co.mz`) e `production` (`https://api.edpay.co.mz`).
-- [x] Utilitário criptográfico `verifyWebhookSignature` com `crypto.timingSafeEqual` (HMAC SHA-256).
+### Phase 1: Core Architecture & Authentication (Completed)
+- [x] Official headers: `X-EDPay-Public-Key` and `X-EDPay-Private-Key`.
+- [x] Idempotency support via `Idempotency-Key`.
+- [x] Automatic switching between `sandbox` (`https://sandbox-api.edpay.co.mz`) and `production` (`https://api.edpay.co.mz`).
+- [x] `verifyWebhookSignature` cryptographic utility using `crypto.timingSafeEqual` (HMAC SHA-256).
 
-### Fase 2: Módulos de Recursos da API (Concluído)
+### Phase 2: API Resource Modules (Completed)
 - [x] `PaymentsResource`: `create`, `retrieve`, `cancel`.
 - [x] `CheckoutResource`: `createSession`, `retrieveSession`, `expireSession`.
 - [x] `PaymentLinksResource`: `create`, `retrieve`, `revoke`.
 - [x] `CustomersResource`: `create`, `retrieve`, `update`.
 
-### Fase 3: Framework Helpers & Middlewares (Em Planeamento)
-- [ ] Express middleware para verificação de webhook `edpayWebhookMiddleware()`.
-- [ ] Next.js Edge / Node route helper `createWebhookHandler()`.
+### Phase 3: Framework Helpers & Middleware (Planned)
+- [ ] Express middleware for webhook verification: `edpayWebhookMiddleware()`.
+- [ ] Next.js Edge / Node route helper: `createWebhookHandler()`.
 
-### Fase 4: Distribuição & CI/CD
-- [ ] Pipeline no GitHub Actions para compilação e publicação no npm (`@edpay/sdk`).
-- [ ] Testes de integração automatizados.
+### Phase 4: Distribution & CI/CD
+- [ ] GitHub Actions pipeline for building and publishing to npm (`@edutecka-mz/edpay-sdk`).
+- [ ] Automated integration tests.

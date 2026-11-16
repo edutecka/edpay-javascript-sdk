@@ -30,12 +30,22 @@ class CheckoutResource {
     async retrieveSessionPayment(token, paymentId) {
         return this.client.request("GET", `/v1/checkout/sessions/${encodeURIComponent(token)}/payments/${encodeURIComponent(paymentId)}`, undefined, undefined, false);
     }
+    /** Change method for the same session payment after the previous attempt definitively failed. */
+    async createSessionPaymentAttempt(token, paymentId, options) {
+        const { idempotencyKey, ...payload } = options;
+        return this.client.request("POST", `/v1/checkout/sessions/${encodeURIComponent(token)}/payments/${encodeURIComponent(paymentId)}/attempts`, payload, { "Idempotency-Key": idempotencyKey }, false);
+    }
     async createPaymentLinkPayment(linkId, options) {
         const { idempotencyKey, ...payload } = options;
         return this.client.request("POST", `/v1/checkout/payment-links/${encodeURIComponent(linkId)}/payments`, payload, { "Idempotency-Key": idempotencyKey }, false);
     }
     async retrievePaymentLinkPayment(linkId, paymentId) {
         return this.client.request("GET", `/v1/checkout/payment-links/${encodeURIComponent(linkId)}/payments/${encodeURIComponent(paymentId)}`, undefined, undefined, false);
+    }
+    /** Change method for the same payment-link payment after the previous attempt definitively failed. */
+    async createPaymentLinkPaymentAttempt(linkId, paymentId, options) {
+        const { idempotencyKey, ...payload } = options;
+        return this.client.request("POST", `/v1/checkout/payment-links/${encodeURIComponent(linkId)}/payments/${encodeURIComponent(paymentId)}/attempts`, payload, { "Idempotency-Key": idempotencyKey }, false);
     }
 }
 exports.CheckoutResource = CheckoutResource;
