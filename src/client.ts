@@ -29,12 +29,19 @@ export class EDPayClient {
   public readonly public: PublicResource;
 
   constructor(options: EDPayClientOptions) {
-    if (!options?.publicKey || !options?.privateKey) {
-      throw new Error("EDPayClient requires both publicKey and privateKey.");
+    const publicKey = options?.publicKey?.trim();
+    const privateKey = options?.privateKey?.trim();
+    const publicMode = publicKey?.match(/^pk_(test|live)_[a-fA-F0-9]{24}$/)?.[1] ?? null;
+    const privateMode = privateKey?.match(/^sk_(test|live)_[a-fA-F0-9]{64}$/)?.[1] ?? null;
+    if (!publicMode || !privateMode) {
+      throw new Error("EDPayClient requires a valid publicKey (pk_test_/pk_live_ plus 24 hex characters) and privateKey (sk_test_/sk_live_ plus 64 hex characters).");
+    }
+    if (publicMode !== privateMode) {
+      throw new Error("EDPay publicKey and privateKey must use the same environment (test or live).");
     }
 
-    this.publicKey = options.publicKey;
-    this.privateKey = options.privateKey;
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
     this.timeoutMs = options.timeoutMs ?? 30000;
 
     if (options.baseUrl) {
@@ -67,7 +74,7 @@ export class EDPayClient {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "User-Agent": "EDPay-Node-SDK/1.5.0",
+      "User-Agent": "EDPay-Node-SDK/1.5.1",
       ...customHeaders,
     };
     if (authenticated) {

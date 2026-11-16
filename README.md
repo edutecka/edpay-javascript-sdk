@@ -57,6 +57,8 @@ const availableMethods = catalog.data.payment_methods.filter((method) => method.
 
 ## Create a payment from a Node.js service
 
+Every partner API request requires both `EDPAY_PUBLIC_KEY` (`pk_test_` or `pk_live_`) and `EDPAY_PRIVATE_KEY` (`sk_test_` or `sk_live_`) from the same environment. The SDK rejects missing, blank, or mismatched key pairs when creating the client. Public catalog requests and buyer-facing checkout requests authenticated by a checkout token do not use the partner key pair; never put the private key in browser code.
+
 Store the keys in the server environment, not in source control:
 
 ```dotenv

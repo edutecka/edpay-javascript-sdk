@@ -4,12 +4,14 @@ const test = require("node:test");
 
 const { verifyWebhookSignature } = require("../dist/webhooks.js");
 
-test("accepts a valid HMAC-SHA256 signature", () => {
+test("accepts a valid EDPay timestamped HMAC-SHA256 signature", () => {
   const payload = JSON.stringify({ type: "payment.succeeded" });
   const secret = "test-webhook-secret";
-  const signature = crypto.createHmac("sha256", secret).update(payload).digest("hex");
+  const timestamp = 1_700_000_000;
+  const signature = crypto.createHmac("sha256", secret).update(`${timestamp}.`).update(payload).digest("hex");
+  const signatureHeader = `t=${timestamp},v1=${signature}`;
 
-  assert.equal(verifyWebhookSignature(payload, signature, secret), true);
+  assert.equal(verifyWebhookSignature(payload, signatureHeader, secret, { now: timestamp }), true);
 });
 
 test("rejects invalid, empty, and mismatched signatures", () => {
