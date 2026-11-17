@@ -1,7 +1,5 @@
 import type { EDPayClientOptions } from "./types.js";
 import { PaymentsResource } from "./resources/payments.js";
-import { CheckoutResource } from "./resources/checkout.js";
-import { PaymentLinksResource } from "./resources/payment-links.js";
 import { CustomersResource } from "./resources/customers.js";
 import { InvoicesResource } from "./resources/invoices.js";
 import { SubscriptionsResource } from "./resources/subscriptions.js";
@@ -15,8 +13,6 @@ export declare class EDPayClient {
     private readonly baseUrl;
     private readonly timeoutMs;
     readonly payments: PaymentsResource;
-    readonly checkout: CheckoutResource;
-    readonly paymentLinks: PaymentLinksResource;
     readonly customers: CustomersResource;
     readonly invoices: InvoicesResource;
     readonly subscriptions: SubscriptionsResource;

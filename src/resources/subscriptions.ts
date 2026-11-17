@@ -2,7 +2,7 @@ export class SubscriptionsResource {
   constructor(private readonly client: { request: (method: string, path: string, body?: unknown, headers?: Record<string, string>) => Promise<any> }) {}
 
   async create(payload: Record<string, unknown>, idempotencyKey: string): Promise<any> {
-    return this.client.request("POST", "/v1/invoice-series", payload, { "Idempotency-Key": idempotencyKey });
+    return this.client.request("POST", "/v1/invoices/series", payload, { "Idempotency-Key": idempotencyKey });
   }
 
   async list(params?: { limit?: number }): Promise<any> {
@@ -11,14 +11,14 @@ export class SubscriptionsResource {
       query.set("limit", String(params.limit));
     }
     const qs = query.toString();
-    return this.client.request("GET", `/v1/invoice-series${qs ? `?${qs}` : ""}`);
+    return this.client.request("GET", `/v1/invoices/series${qs ? `?${qs}` : ""}`);
   }
 
   async pause(seriesId: string): Promise<any> {
-    return this.client.request("POST", `/v1/invoice-series/${encodeURIComponent(seriesId)}/pause`);
+    return this.client.request("POST", `/v1/invoices/series/${encodeURIComponent(seriesId)}/pause`);
   }
 
   async resume(seriesId: string): Promise<any> {
-    return this.client.request("POST", `/v1/invoice-series/${encodeURIComponent(seriesId)}/resume`);
+    return this.client.request("POST", `/v1/invoices/series/${encodeURIComponent(seriesId)}/resume`);
   }
 }

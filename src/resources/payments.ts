@@ -1,7 +1,7 @@
-import type { PaymentAttemptCreateOptions, PaymentCreateOptions } from "../types.js";
+import type { PaymentCreateOptions, PrivateCheckoutOptions, PublicCheckoutOptions, LinkCheckoutOptions, CheckoutMethodOptions } from "../types.js";
 
 export class PaymentsResource {
-  constructor(private readonly client: { request: (method: string, path: string, body?: unknown, headers?: Record<string, string>) => Promise<any> }) {}
+  constructor(private readonly client: { request: (method: string, path: string, body?: unknown, headers?: Record<string, string>, authenticated?: boolean) => Promise<any> }) {}
 
   async create(options: PaymentCreateOptions): Promise<any> {
     const { idempotencyKey, ...payload } = options;
@@ -12,21 +12,46 @@ export class PaymentsResource {
     return this.client.request("POST", "/v1/payments", payload, headers);
   }
 
-  /** Legacy alias for creating a payment intent through /v1/payment-checkout. */
-  async createCheckout(options: PaymentCreateOptions): Promise<any> {
-    const { idempotencyKey, ...payload } = options;
-    return this.client.request("POST", "/v1/payment-checkout", payload, { "Idempotency-Key": idempotencyKey });
-  }
-
-  /** Start another method for this payment after its latest attempt definitively failed. */
-  async createAttempt(paymentId: string, options: PaymentAttemptCreateOptions): Promise<any> {
+  async privateCheckout(paymentId: string, options: PrivateCheckoutOptions): Promise<any> {
     const { idempotencyKey, ...payload } = options;
     return this.client.request(
       "POST",
-      `/v1/payments/${encodeURIComponent(paymentId)}/attempts`,
+      `/v1/payments/${encodeURIComponent(paymentId)}/private-checkout`,
       payload,
       { "Idempotency-Key": idempotencyKey }
     );
+  }
+
+  async publicCheckout(paymentId: string, options: PublicCheckoutOptions): Promise<any> {
+    const { idempotencyKey, ...payload } = options;
+    return this.client.request("POST", `/v1/payments/${encodeURIComponent(paymentId)}/public-checkout`, payload, { "Idempotency-Key": idempotencyKey });
+  }
+
+  async linkCheckout(paymentId: string, options: LinkCheckoutOptions): Promise<any> {
+    const { idempotencyKey, ...payload } = options;
+    return this.client.request("POST", `/v1/payments/${encodeURIComponent(paymentId)}/link-checkout`, payload, { "Idempotency-Key": idempotencyKey });
+  }
+
+  /** Lists executions with their checkout mode and sessions with no submission. */
+  async listCheckouts(paymentId: string): Promise<any> {
+    return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}/checkouts`);
+  }
+
+  async getCheckout(token: string): Promise<any> {
+    return this.client.request("GET", `/v1/payments/checkouts/${encodeURIComponent(token)}`, undefined, undefined, false);
+  }
+
+  async submitCheckoutPayment(token: string, options: CheckoutMethodOptions): Promise<any> {
+    const { idempotencyKey, ...payload } = options;
+    return this.client.request("POST", `/v1/payments/checkouts/${encodeURIComponent(token)}/payment`, payload, { "Idempotency-Key": idempotencyKey }, false);
+  }
+
+  async retrieveCheckoutPayment(token: string): Promise<any> {
+    return this.client.request("GET", `/v1/payments/checkouts/${encodeURIComponent(token)}/payment`, undefined, undefined, false);
+  }
+
+  async framePolicy(token: string): Promise<any> {
+    return this.client.request("GET", `/v1/payments/checkouts/${encodeURIComponent(token)}/frame-policy`, undefined, undefined, false);
   }
 
   async list(limit = 50): Promise<any> {
@@ -42,7 +67,4 @@ export class PaymentsResource {
     return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}/events`);
   }
 
-  async listAttempts(paymentId: string): Promise<any> {
-    return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}/attempts`);
-  }
 }

@@ -7,7 +7,7 @@ class SubscriptionsResource {
         this.client = client;
     }
     async create(payload, idempotencyKey) {
-        return this.client.request("POST", "/v1/invoice-series", payload, { "Idempotency-Key": idempotencyKey });
+        return this.client.request("POST", "/v1/invoices/series", payload, { "Idempotency-Key": idempotencyKey });
     }
     async list(params) {
         const query = new URLSearchParams();
@@ -15,13 +15,13 @@ class SubscriptionsResource {
             query.set("limit", String(params.limit));
         }
         const qs = query.toString();
-        return this.client.request("GET", `/v1/invoice-series${qs ? `?${qs}` : ""}`);
+        return this.client.request("GET", `/v1/invoices/series${qs ? `?${qs}` : ""}`);
     }
     async pause(seriesId) {
-        return this.client.request("POST", `/v1/invoice-series/${encodeURIComponent(seriesId)}/pause`);
+        return this.client.request("POST", `/v1/invoices/series/${encodeURIComponent(seriesId)}/pause`);
     }
     async resume(seriesId) {
-        return this.client.request("POST", `/v1/invoice-series/${encodeURIComponent(seriesId)}/resume`);
+        return this.client.request("POST", `/v1/invoices/series/${encodeURIComponent(seriesId)}/resume`);
     }
 }
 exports.SubscriptionsResource = SubscriptionsResource;

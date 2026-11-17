@@ -3,8 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EDPayClient = void 0;
 const exceptions_js_1 = require("./exceptions.js");
 const payments_js_1 = require("./resources/payments.js");
-const checkout_js_1 = require("./resources/checkout.js");
-const payment_links_js_1 = require("./resources/payment-links.js");
 const customers_js_1 = require("./resources/customers.js");
 const invoices_js_1 = require("./resources/invoices.js");
 const subscriptions_js_1 = require("./resources/subscriptions.js");
@@ -18,8 +16,6 @@ class EDPayClient {
     baseUrl;
     timeoutMs;
     payments;
-    checkout;
-    paymentLinks;
     customers;
     invoices;
     subscriptions;
@@ -49,8 +45,6 @@ class EDPayClient {
                 options.baseUrl || "https://api-pay.edutecka.com";
         }
         this.payments = new payments_js_1.PaymentsResource(this);
-        this.checkout = new checkout_js_1.CheckoutResource(this);
-        this.paymentLinks = new payment_links_js_1.PaymentLinksResource(this);
         this.customers = new customers_js_1.CustomersResource(this);
         this.invoices = new invoices_js_1.InvoicesResource(this);
         this.subscriptions = new subscriptions_js_1.SubscriptionsResource(this);

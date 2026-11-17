@@ -9,21 +9,20 @@ export interface EDPayClientOptions {
 export interface PaymentCreateOptions {
     amount_minor: number;
     currency: "MZN" | "USD" | "EUR";
-    method?: string;
-    phone?: string;
     customer_id?: string;
     reference?: string;
     description?: string;
-    channel?: PaymentChannelOptions;
     idempotencyKey: string;
 }
-/** Create a child attempt using another method for an existing payment. */
-export interface PaymentAttemptCreateOptions {
+export interface PrivateCheckoutOptions {
     method: string;
     phone?: string;
     channel?: PaymentChannelOptions;
     idempotencyKey: string;
 }
+export interface PublicCheckoutOptions { embed_origin?: string; idempotencyKey: string; }
+export interface LinkCheckoutOptions { expires_at?: string; idempotencyKey: string; }
+export interface CheckoutMethodOptions { method: string; phone?: string; channel?: PaymentChannelOptions; idempotencyKey: string; }
 /** Method-specific payment instrument fields accepted by the partner API. */
 export interface PaymentChannelOptions {
     type?: string;
@@ -35,17 +34,8 @@ export interface PaymentChannelOptions {
     return_url?: string;
     holder_name?: string;
 }
-export interface CheckoutSessionCreateOptions {
-    payment_link_id: string;
-    embed_origin?: string;
-    idempotencyKey: string;
-}
-export interface PaymentLinkCreateOptions {
-    amount_minor: number;
-    currency: "MZN" | "USD" | "EUR";
-    expires_at?: string;
-    idempotencyKey: string;
-}
+
+
 export interface CustomerCreateOptions {
     name: string;
     email?: string;
@@ -56,11 +46,7 @@ export interface CustomerUpdateOptions {
     email?: string;
     idempotencyKey: string;
 }
-export interface CheckoutPaymentOptions {
-    method: string;
-    phone: string;
-    idempotencyKey: string;
-}
+
 export interface WebhookEndpointAuth {
     type: "bearer";
     token: string;

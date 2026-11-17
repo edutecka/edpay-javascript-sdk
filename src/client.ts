@@ -1,8 +1,6 @@
 import type { EDPayClientOptions } from "./types.js";
 import { EDPayError } from "./exceptions.js";
 import { PaymentsResource } from "./resources/payments.js";
-import { CheckoutResource } from "./resources/checkout.js";
-import { PaymentLinksResource } from "./resources/payment-links.js";
 import { CustomersResource } from "./resources/customers.js";
 import { InvoicesResource } from "./resources/invoices.js";
 import { SubscriptionsResource } from "./resources/subscriptions.js";
@@ -18,8 +16,6 @@ export class EDPayClient {
   private readonly timeoutMs: number;
 
   public readonly payments: PaymentsResource;
-  public readonly checkout: CheckoutResource;
-  public readonly paymentLinks: PaymentLinksResource;
   public readonly customers: CustomersResource;
   public readonly invoices: InvoicesResource;
   public readonly subscriptions: SubscriptionsResource;
@@ -52,8 +48,6 @@ export class EDPayClient {
     }
 
     this.payments = new PaymentsResource(this);
-    this.checkout = new CheckoutResource(this);
-    this.paymentLinks = new PaymentLinksResource(this);
     this.customers = new CustomersResource(this);
     this.invoices = new InvoicesResource(this);
     this.subscriptions = new SubscriptionsResource(this);

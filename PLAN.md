@@ -17,8 +17,8 @@
 
 ### Phase 2: API Resource Modules (Completed)
 - [x] `PaymentsResource`: `create`, `retrieve`, `cancel`.
-- [x] `CheckoutResource`: `createSession`, `retrieveSession`, `expireSession`.
-- [x] `PaymentLinksResource`: `create`, `retrieve`, `revoke`.
+- [x] Checkout operations are exposed as child methods of `payments`. (`create`, `publicCheckout`, `linkCheckout`, and token methods)
+- [x] Standalone payment-link resources are superseded by `payments.linkCheckout(paymentId, ...)`.
 - [x] `CustomersResource`: `create`, `retrieve`, `update`.
 
 ### Phase 3: Framework Helpers & Middleware (Planned)
