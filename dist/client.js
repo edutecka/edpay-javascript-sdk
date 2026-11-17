@@ -36,7 +36,7 @@ class EDPayClient {
         }
         this.publicKey = publicKey;
         this.privateKey = privateKey;
-        this.timeoutMs = options.timeoutMs ?? 30000;
+        this.timeoutMs = options.timeoutMs ?? 90000;
         if (options.baseUrl) {
             this.baseUrl = options.baseUrl.replace(/\/+$/, "");
         }
