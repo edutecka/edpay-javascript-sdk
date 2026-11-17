@@ -3,10 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaymentsResource = void 0;
 class PaymentsResource {
     client;
-    constructor(client) { this.client = client; }
+    constructor(client) {
+        this.client = client;
+    }
     async create(options) {
         const { idempotencyKey, ...payload } = options;
-        const headers = { "Idempotency-Key": idempotencyKey };
+        const headers = {};
+        if (idempotencyKey) {
+            headers["Idempotency-Key"] = idempotencyKey;
+        }
         return this.client.request("POST", "/v1/payments", payload, headers);
     }
     async privateCheckout(paymentId, options) {
@@ -21,18 +26,33 @@ class PaymentsResource {
         const { idempotencyKey, ...payload } = options;
         return this.client.request("POST", `/v1/payments/${encodeURIComponent(paymentId)}/link-checkout`, payload, { "Idempotency-Key": idempotencyKey });
     }
-    /** Lists private checkout attempts currently returned by the API. */
-    async listCheckouts(paymentId) { return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}/checkouts`); }
-    async getCheckout(token) { return this.client.request("GET", `/v1/payments/checkouts/${encodeURIComponent(token)}`, undefined, undefined, false); }
+    /** Lists executions with their checkout mode and sessions with no submission. */
+    async listCheckouts(paymentId) {
+        return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}/checkouts`);
+    }
+    async getCheckout(token) {
+        return this.client.request("GET", `/v1/payments/checkouts/${encodeURIComponent(token)}`, undefined, undefined, false);
+    }
     async submitCheckoutPayment(token, options) {
         const { idempotencyKey, ...payload } = options;
         return this.client.request("POST", `/v1/payments/checkouts/${encodeURIComponent(token)}/payment`, payload, { "Idempotency-Key": idempotencyKey }, false);
     }
-    async retrieveCheckoutPayment(token) { return this.client.request("GET", `/v1/payments/checkouts/${encodeURIComponent(token)}/payment`, undefined, undefined, false); }
-    async framePolicy(token) { return this.client.request("GET", `/v1/payments/checkouts/${encodeURIComponent(token)}/frame-policy`, undefined, undefined, false); }
-    async list(limit = 50) { return this.client.request("GET", `/v1/payments?${new URLSearchParams({ limit: String(limit) })}`); }
-    async retrieve(paymentId) { return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}`); }
-    async listEvents(paymentId) { return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}/events`); }
+    async retrieveCheckoutPayment(token) {
+        return this.client.request("GET", `/v1/payments/checkouts/${encodeURIComponent(token)}/payment`, undefined, undefined, false);
+    }
+    async framePolicy(token) {
+        return this.client.request("GET", `/v1/payments/checkouts/${encodeURIComponent(token)}/frame-policy`, undefined, undefined, false);
+    }
+    async list(limit = 50) {
+        const query = new URLSearchParams({ limit: String(limit) });
+        return this.client.request("GET", `/v1/payments?${query}`);
+    }
+    async retrieve(paymentId) {
+        return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}`);
+    }
+    async listEvents(paymentId) {
+        return this.client.request("GET", `/v1/payments/${encodeURIComponent(paymentId)}/events`);
+    }
 }
 exports.PaymentsResource = PaymentsResource;
 //# sourceMappingURL=payments.js.map

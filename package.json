@@ -1,6 +1,6 @@
 {
   "name": "@edutecka-mz/edpay-sdk",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "Official EDPay SDK for Node.js and TypeScript with multi-gateway payments, hosted checkout, and webhook verification.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

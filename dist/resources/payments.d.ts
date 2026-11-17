@@ -1,12 +1,14 @@
 import type { PaymentCreateOptions, PrivateCheckoutOptions, PublicCheckoutOptions, LinkCheckoutOptions, CheckoutMethodOptions } from "../types.js";
 export declare class PaymentsResource {
     private readonly client;
-    constructor(client: { request: (method: string, path: string, body?: unknown, headers?: Record<string, string>, authenticated?: boolean) => Promise<any>; });
+    constructor(client: {
+        request: (method: string, path: string, body?: unknown, headers?: Record<string, string>, authenticated?: boolean) => Promise<any>;
+    });
     create(options: PaymentCreateOptions): Promise<any>;
     privateCheckout(paymentId: string, options: PrivateCheckoutOptions): Promise<any>;
     publicCheckout(paymentId: string, options: PublicCheckoutOptions): Promise<any>;
     linkCheckout(paymentId: string, options: LinkCheckoutOptions): Promise<any>;
-    /** Lists private checkout attempts currently returned by the API. */
+    /** Lists executions with their checkout mode and sessions with no submission. */
     listCheckouts(paymentId: string): Promise<any>;
     getCheckout(token: string): Promise<any>;
     submitCheckoutPayment(token: string, options: CheckoutMethodOptions): Promise<any>;
@@ -16,3 +18,4 @@ export declare class PaymentsResource {
     retrieve(paymentId: string): Promise<any>;
     listEvents(paymentId: string): Promise<any>;
 }
+//# sourceMappingURL=payments.d.ts.map
