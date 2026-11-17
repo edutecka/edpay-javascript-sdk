@@ -57,7 +57,7 @@ class EDPayClient {
         const headers = {
             "Content-Type": "application/json",
             Accept: "application/json",
-            "User-Agent": "EDPay-Node-SDK/1.6.1",
+            "User-Agent": "EDPay-Node-SDK/1.6.2",
             ...customHeaders,
         };
         if (authenticated) {
