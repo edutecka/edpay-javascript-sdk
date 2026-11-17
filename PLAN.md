@@ -16,9 +16,9 @@
 - [x] `verifyWebhookSignature` cryptographic utility using `crypto.timingSafeEqual` (HMAC SHA-256).
 
 ### Phase 2: API Resource Modules (Completed)
-- [x] `PaymentsResource`: `create`, `retrieve`, `cancel`.
-- [x] Checkout operations are exposed as child methods of `payments`. (`create`, `publicCheckout`, `linkCheckout`, and token methods)
-- [x] Standalone payment-link resources are superseded by `payments.linkCheckout(paymentId, ...)`.
+- [x] `PaymentsResource`: create and retrieve payment records.
+- [x] Checkout operations are child methods of `payments`: `privateCheckout`, `publicCheckout`, `linkCheckout`, and token-based buyer operations.
+- [x] Link checkout is created for an existing payment with `payments.linkCheckout(paymentId, ...)`.
 - [x] `CustomersResource`: `create`, `retrieve`, `update`.
 
 ### Phase 3: Framework Helpers & Middleware (Planned)

@@ -221,7 +221,7 @@ export async function POST(request: Request) {
 }
 ```
 
-`EDPayWebhookEvent` and `EDPayWebhookPaymentData` describe the verified event envelope and sanitized payment fields. Match orders by `data.reference`; payment-link-specific details are not needed for correlation. Reconciliation status/code and fee/net breakdown fields are optional because they are not present in every event. The verifier returns a boolean, so parse/cast only after signature verification.
+`EDPayWebhookEvent` and `EDPayWebhookPaymentData` describe the verified event envelope and sanitized payment fields. Match orders by `data.reference`; link-checkout details are not needed for correlation. Reconciliation status/code and fee/net breakdown fields are optional because they are not present in every event. The verifier returns a boolean, so parse/cast only after signature verification.
 
 The public support-chat route streams server-sent events and is not exposed by this release's JSON request helpers.
 
