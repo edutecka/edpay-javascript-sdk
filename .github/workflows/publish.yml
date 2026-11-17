@@ -1,0 +1,39 @@
+name: Publish npm package
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install npm with trusted publishing support
+        run: npm install --global npm@11.5.1
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-package-lock
+
+      - name: Build and test
+        run: |
+          npm run build
+          npm test
+
+      - name: Publish package
+        run: npm publish --access public --ignore-scripts
