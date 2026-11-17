@@ -12,7 +12,7 @@
 ### Phase 1: Core Architecture & Authentication (Completed)
 - [x] Official headers: `X-EDPay-Public-Key` and `X-EDPay-Private-Key`.
 - [x] Idempotency support via `Idempotency-Key`.
-- [x] Automatic switching between `sandbox` (`https://sandbox-api.edpay.co.mz`) and `production` (`https://api.edpay.co.mz`).
+- [x] Use the single API host; test or live access is selected by the matching API key prefixes.
 - [x] `verifyWebhookSignature` cryptographic utility using `crypto.timingSafeEqual` (HMAC SHA-256).
 
 ### Phase 2: API Resource Modules (Completed)

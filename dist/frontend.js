@@ -18,10 +18,7 @@ class EDPay {
                 this.baseUrl = options.baseUrl.replace(/\/+$/, "");
             }
             else {
-                this.baseUrl =
-                    options.environment === "sandbox"
-                        ? "https://pay.edutecka.com"
-                        : "https://pay.edutecka.com";
+                this.baseUrl = "https://pay.edutecka.com";
             }
         }
     }

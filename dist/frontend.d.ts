@@ -1,6 +1,5 @@
 export interface EDPayFrontendOptions {
     publicKey: string;
-    environment?: "production" | "sandbox";
     baseUrl?: string;
 }
 export interface OpenModalOptions {

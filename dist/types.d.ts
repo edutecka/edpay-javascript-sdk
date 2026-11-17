@@ -1,8 +1,6 @@
-export type EDPayEnvironment = "production" | "sandbox";
 export interface EDPayClientOptions {
     publicKey: string;
     privateKey: string;
-    environment?: EDPayEnvironment;
     baseUrl?: string;
     timeoutMs?: number;
 }

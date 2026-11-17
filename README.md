@@ -73,7 +73,6 @@ import { normalizePhoneNumber, phoneNumberOptionsForMethod } from "@edutecka-mz/
 const edpay = new EDPayClient({
   publicKey: process.env.EDPAY_PUBLIC_KEY!,
   privateKey: process.env.EDPAY_PRIVATE_KEY!,
-  environment: "sandbox",
 });
 
 const payment = await edpay.payments.create({
@@ -99,7 +98,6 @@ import { EDPay } from "@edutecka-mz/edpay-sdk/frontend";
 const checkoutToken = "<TOKEN_RETURNED_BY_YOUR_SERVER>";
 const checkoutClient = new EDPay({
   publicKey: process.env.NEXT_PUBLIC_EDPAY_PUBLIC_KEY!,
-  environment: "sandbox",
 });
 
 checkoutClient.checkout({ token: checkoutToken, mode: "redirect" });

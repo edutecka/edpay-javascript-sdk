@@ -21,9 +21,7 @@
       if (options.baseUrl) {
         this.baseUrl = options.baseUrl.replace(/\/+$/, '');
       } else {
-        this.baseUrl = options.environment === 'sandbox'
-          ? 'https://sandbox.pay.edutecka.com'
-          : 'https://pay.edutecka.com';
+        this.baseUrl = 'https://pay.edutecka.com';
       }
     } else {
       throw new Error('EDPay requires an options object or public key string.');

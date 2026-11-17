@@ -41,8 +41,7 @@ class EDPayClient {
             this.baseUrl = options.baseUrl.replace(/\/+$/, "");
         }
         else {
-            this.baseUrl =
-                options.baseUrl || "https://api-pay.edutecka.com";
+            this.baseUrl = "https://api-pay.edutecka.com";
         }
         this.payments = new payments_js_1.PaymentsResource(this);
         this.customers = new customers_js_1.CustomersResource(this);
@@ -58,7 +57,7 @@ class EDPayClient {
         const headers = {
             "Content-Type": "application/json",
             Accept: "application/json",
-            "User-Agent": "EDPay-Node-SDK/1.6.0",
+            "User-Agent": "EDPay-Node-SDK/1.6.1",
             ...customHeaders,
         };
         if (authenticated) {
